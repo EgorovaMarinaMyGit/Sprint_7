@@ -1,10 +1,9 @@
 import allure
 import pytest
 import random
-import requests
 from methods.order_methods import OrderMethods
 from methods.courier_methods import CourierMethods
-from data import ORDER_DATA_1, ORDER_DATA_2, ORDER_DATA_3, ORDER_DATA_4, BASE_URL, ORDERS_URL, ACCEPT_URL
+from data import ORDER_DATA_1, ORDER_DATA_2, ORDER_DATA_3, ORDER_DATA_4
 
 
 class TestOrder:

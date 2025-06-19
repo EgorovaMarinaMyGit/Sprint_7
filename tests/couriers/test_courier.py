@@ -1,7 +1,6 @@
 import allure
 import random
 from methods.courier_methods import CourierMethods
-from conftest import courier
 from data import COURIER_DATA_NO_LOGIN, COURIER_DATA_NO_PASSWORD, COURIER_DATA_INCORRECT_LOGIN, COURIER_DATA_INCORRECT_PASSWORD, COURIER_DATA_NO_EXIST_ACCOUNT
 
 
@@ -9,7 +8,7 @@ class TestCourier:
 
     @allure.title("Успешное создание курьера")
     def test_create_courier_passed(self):
-        courier = CourierMethods()  # создаем объект класса
+        courier = CourierMethods()  
         response, status_code, login, password = courier.create_courier_success()
         assert status_code == 201 and response == {'ok': True}
 
