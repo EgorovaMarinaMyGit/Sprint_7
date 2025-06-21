@@ -3,7 +3,7 @@ import allure
 from data import BASE_URL, ORDERS_URL, TRACK_URL, ACCEPT_URL
 
 
-class OrderMethods():
+class OrderMethods:
 
     @allure.step("Создание заказа")
     def create_order(sels, params):
@@ -15,21 +15,24 @@ class OrderMethods():
         response = requests.get(f'{BASE_URL}{ORDERS_URL}')
         return response.json(), response.status_code
     
-    @allure.step("Получение заказа с использованием трекингового номера")
-    def get_order_with_some_track(self, track):
-        response = requests.get(f'{BASE_URL}{ORDERS_URL}{TRACK_URL}', params={'t': track})
-        return response.json(), response.status_code, response.json()['order']['id']
-    
-    @allure.step("Получение заказа без использования трекингового номера")
-    def get_order_without_track(self):
-        response = requests.get(f'{BASE_URL}{ORDERS_URL}{TRACK_URL}', params={'t': ''})
-        return response.json(), response.status_code
-    
-    @allure.step("Получение заказа с некорректным трекинговым номером")
-    def get_order_with_incorrect_track(self, track):
-        response = requests.get(f'{BASE_URL}{ORDERS_URL}{TRACK_URL}', params={'t': track})
-        return response.json(), response.status_code
-
+    @allure.step("Получение заказа")
+    def get_order_with_some_track(self, params):
+        response = None
+        try:
+            response = requests.get(f'{BASE_URL}{ORDERS_URL}{TRACK_URL}', params=params)
+            json_response = response.json()
+        except requests.RequestException as e:
+            # Обработка ошибок сети или запроса
+            return {"message": str(e)}, None, None
+        except ValueError:
+            # Обработка ошибок при парсинге JSON
+            return {"message": "Некорректный ответ сервера"}, response.status_code if response else None, None
+        # Проверяем наличие ключа 'order'
+        order_id = None
+        if 'order' in json_response:
+            order_id = json_response['order'].get('id')
+        return response.json(), response.status_code, order_id
+  
     @allure.step("Принять заказ")
     def accept_order(self, id_order, params):
         response = requests.put(f'{BASE_URL}{ORDERS_URL}{ACCEPT_URL}{id_order}', params=params)

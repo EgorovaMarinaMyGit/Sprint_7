@@ -21,22 +21,25 @@ class TestCourier:
             "login": login,
             "password": password
         }
+        message = "Этот логин уже используется. Попробуйте другой."
         response, status_code, login, password = courier.create_courier_success(params_create)
-        assert status_code == 409 and response == {"code": 409, "message": "Этот логин уже используется. Попробуйте другой."}
+        assert status_code == 409 and response["message"] == message
 
 
     @allure.title("Создание курьера без логина")
     def test_create_courier_without_login(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_create_no_login(COURIER_DATA_NO_LOGIN)
-        assert status_code == 400 and  response == {"code": 400, "message": "Недостаточно данных для создания учетной записи"}
+        message = "Недостаточно данных для создания учетной записи"
+        response, status_code = courier.courier_create_no_smth_data(COURIER_DATA_NO_LOGIN)
+        assert status_code == 400 and response["message"] == message
 
 
     @allure.title("Создание курьера без пароля")
     def test_create_courier_without_password(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_create_no_login(COURIER_DATA_NO_PASSWORD)
-        assert status_code == 400 and response == {"code": 400, "message": "Недостаточно данных для создания учетной записи"}
+        message = "Недостаточно данных для создания учетной записи"
+        response, status_code = courier.courier_create_no_smth_data(COURIER_DATA_NO_PASSWORD)
+        assert status_code == 400 and response["message"] == message
 
 
     @allure.title("Создание курьера без имени")
@@ -58,39 +61,49 @@ class TestCourier:
         assert status_code == 200 and courier_id is not None
 
 
+
+
+
+
+
     @allure.title("Авторизация с неправильным логином")
     def test_autorisation_courier_incorrect_login(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_login_incorrect_login(COURIER_DATA_INCORRECT_LOGIN)
-        assert status_code == 404 and response == {"code": 404, "message": "Учетная запись не найдена"}
+        message = "Учетная запись не найдена"
+        response, status_code = courier.courier_login_incorrect_smth_data(COURIER_DATA_INCORRECT_LOGIN)
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Авторизация с неправильным паролем")
     def test_autorisation_courier_incorrect_password(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_login_incorrect_password(COURIER_DATA_INCORRECT_PASSWORD)
-        assert status_code == 404 and response == {"code": 404, "message": "Учетная запись не найдена"}
+        message = "Учетная запись не найдена"
+        response, status_code = courier.courier_login_incorrect_smth_data(COURIER_DATA_INCORRECT_PASSWORD)
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Авторизация без логина")
     def test_autorisation_courier_without_login(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_login_without_login(COURIER_DATA_NO_LOGIN)
-        assert status_code == 400 and response == {"code": 400, "message": "Недостаточно данных для входа"}
+        message = "Недостаточно данных для входа"
+        response, status_code = courier.courier_login_incorrect_smth_data(COURIER_DATA_NO_LOGIN)
+        assert status_code == 400 and response["message"] == message
 
 
     @allure.title("Авторизация без пароля")
     def test_autorisation_courier_without_password(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_login_without_password(COURIER_DATA_NO_PASSWORD)
-        assert status_code == 400 and response == {"code": 400, "message": "Недостаточно данных для входа"}
+        message = "Недостаточно данных для входа"
+        response, status_code = courier.courier_login_incorrect_smth_data(COURIER_DATA_NO_PASSWORD)
+        assert status_code == 400 and response["message"] == message
 
 
     @allure.title("Авторизация несуществующего пользователя")
     def test_autorisation_no_exist_user(self):
         courier = CourierMethods()
-        response, status_code = courier.courier_login_no_exist_data(COURIER_DATA_NO_EXIST_ACCOUNT)
-        assert status_code == 404 and response == {"code": 404, "message": "Учетная запись не найдена"}
+        message = "Учетная запись не найдена"
+        response, status_code = courier.courier_login_incorrect_smth_data(COURIER_DATA_NO_EXIST_ACCOUNT)
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Удаление курьера с существующим id")
@@ -110,14 +123,16 @@ class TestCourier:
     def test_delete_courier_id_not_exist(self):
         courier = CourierMethods() 
         random_id = random.randint(10_000, 99_999)
+        message = "Курьера с таким id нет."
         response, status_code = courier.courier_delete(random_id)
-        assert status_code == 404 and response == {"code": 404, "message": "Курьера с таким id нет."}
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Удаление курьера без id")
     def test_delete_courier_without_id(self):
         courier = CourierMethods()
         id = ""
+        message = "Not Found."
         response, status_code = courier.courier_delete(id)
-        assert status_code == 404 and response == {"code": 404, "message": "Not Found."}
+        assert status_code == 404 and response["message"] == message
 

@@ -33,11 +33,12 @@ class TestOrder:
 
 
     @allure.title("Получение заказа по трекинговому номеру")
-    def test_get_order_with_correct_track(self):
+    def test_get_order_with_correct_track_1(self):
         order = OrderMethods()
         #response, status_code, order_track = order.create_order(ORDER_DATA_1)
-        order_track = order.create_order(ORDER_DATA_1)[2]
-        response, status_code, order_id = order.get_order_with_some_track(order_track)
+        track = order.create_order(ORDER_DATA_1)[2]
+        params = {'t': track}
+        response, status_code, order_id = order.get_order_with_some_track(params)
         expected_result = {
             "firstName": "Sakura",
             "lastName": "Haruno",
@@ -53,20 +54,24 @@ class TestOrder:
         }
         assert status_code == 200 and ORDER_DATA_1 == expected_result
 
-    
-    @allure.title("Получение заказа без трекингового номера")
-    def test_get_order_without_track(self):
-        order = OrderMethods()
-        response, status_code = order.get_order_without_track()
-        assert status_code == 400 and response == {"code": 400, "message": "Недостаточно данных для поиска"}
 
-    
+    @allure.title("Получение заказа без трекингового номера")
+    def test_get_order_without_track_1(self):
+        order = OrderMethods()
+        params = {'t': ''}
+        response, status_code, order_id = order.get_order_with_some_track(params)
+        message = "Недостаточно данных для поиска"
+        assert status_code == 400 and response["message"] == message
+
+
     @allure.title("Получение заказа с некорректным трекинговым номером")
-    def test_get_order_with_incorrect_track(self):
+    def test_get_order_with_incorrect_track_1(self):
         order = OrderMethods()
         track = random.randint(10_0000, 99_9999)
-        response, status_code = order.get_order_with_incorrect_track(track)
-        assert status_code == 404 and response == {"code": 404, "message": "Заказ не найден"}
+        params = {'t': track}
+        response, status_code, order_id = order.get_order_with_some_track(params)
+        message = "Заказ не найден"
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Принять заказ используя корректные Id курьера и Id заказа")
@@ -80,7 +85,6 @@ class TestOrder:
         order_track = order.create_order(ORDER_DATA_1)[2]
         id_order = order.get_order_with_some_track(order_track)[2]
         response, status_code = order.accept_order(id_order, params)
-
         assert status_code == 200 and response == {"ok": True}
 
 
@@ -94,8 +98,8 @@ class TestOrder:
         order_track = order.create_order(ORDER_DATA_1)[2]
         id_order = order.get_order_with_some_track(order_track)[2]
         response, status_code = order.accept_order(id_order, params)
-
-        assert status_code == 400 and response == {"code": 400, "message": "Недостаточно данных для поиска"}
+        message = "Недостаточно данных для поиска"
+        assert status_code == 400 and response["message"] == message
 
 
     @allure.title("Принять заказ используя некорректный Id курьера и корректный Id заказа")
@@ -108,8 +112,8 @@ class TestOrder:
         order_track = order.create_order(ORDER_DATA_1)[2]
         id_order = order.get_order_with_some_track(order_track)[2]
         response, status_code = order.accept_order(id_order, params)
-
-        assert status_code == 404 and response == {"code": 404, "message": "Курьера с таким id не существует"}
+        message = "Курьера с таким id не существует"
+        assert status_code == 404 and response["message"] == message
 
 
     @allure.title("Принять заказ используя корректные Id курьера и без Id заказа")
@@ -122,8 +126,8 @@ class TestOrder:
         order = OrderMethods()
         id_order = ''
         response, status_code = order.accept_order(id_order, params)
-
-        assert status_code == 404 and response ==  {"code": 404, "message": "Not Found."}
+        message = "Not Found."
+        assert status_code == 404 and response["message"] == message
 
     @allure.title("Принять заказ используя корректный Id курьера и некорректный Id заказа")
     def test_get_order_correct_id_courier_and_incorrect_id_order(self, courier_id):
@@ -135,5 +139,5 @@ class TestOrder:
         order = OrderMethods()
         id_order = 53456
         response, status_code = order.accept_order(id_order, params)
-
-        assert status_code == 404 and response == {"code": 404, "message": "Заказа с таким id не существует"}
+        message = "Заказа с таким id не существует"
+        assert status_code == 404 and response["message"] == message
